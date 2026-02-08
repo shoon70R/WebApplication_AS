@@ -1,0 +1,68 @@
+﻿@page
+@model ErrorModel
+@{
+ ViewData["Title"] = "Error";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+   <div class="alert alert-danger" role="alert">
+ <h1 class="display-4 text-danger">
+    <i class="fas fa-exclamation-triangle"></i> Oops! An Error Occurred
+                </h1>
+           <h2 class="text-danger">500 Internal Server Error</h2>
+
+              <p class="lead mt-3">
+            An unexpected error occurred while processing your request.
+      Our team has been notified and is working on a fix.
+     </p>
+
+       <p>
+      We apologize for the inconvenience. Please try again later or 
+               contact support if the problem persists.
+      </p>
+
+         <hr />
+
+          <div class="mt-4">
+   @if (Model.ShowRequestId)
+        {
+       <p class="text-muted mb-3">
+   <small>
+      <strong>Request ID:</strong> <code>@Model.RequestId</code>
+         <br />
+ <strong>Timestamp:</strong> <code>@DateTime.UtcNow:yyyy-MM-dd HH:mm:ss UTC</code>
+          </small>
+   </p>
+      }
+
+      <a href="/" class="btn btn-primary me-2">
+       <i class="fas fa-home"></i> Go to Home
+      </a>
+
+           <button type="button" class="btn btn-secondary" onclick="window.history.back();">
+      <i class="fas fa-arrow-left"></i> Go Back
+        </button>
+      </div>
+
+    @if (Model.ShowRequestId)
+       {
+       <div class="card mt-4 border-secondary">
+      <div class="card-body bg-light">
+ <h5 class="card-title">Development Information</h5>
+  <p class="card-text text-muted">
+    <small>
+              This detailed information is only visible in development mode.
+             <br />
+       In production, users will only see the main error message above.
+         </small>
+        </p>
+    </div>
+ </div>
+           }
+   </div>
+</div>
+    </div>
+</div>

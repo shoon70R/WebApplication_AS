@@ -1,0 +1,191 @@
+@page
+@model LoginModel
+@inject IConfiguration Configuration
+@{
+string recaptchaSiteKey = Configuration["Recaptcha:SiteKey"] ?? string.Empty;
+}
+
+<div class="container-fluid d-flex align-items-center justify-content-center min-vh-100">
+ <div class="row justify-content-center w-100">
+     <div class="col-md-5 col-lg-4">
+   <div class="text-center mb-4">
+ <h1 class="h3 fw-bold">Welcome to<br>Ace Job Agency</h1>
+  <p class="text-muted small">Please log in to your account</p>
+    </div>
+
+     <div class="card shadow-lg">
+    <div class="card-body p-4">
+  <form method="post" id="loginForm">
+    @* Custom error messages without bullet points - only show if there are actual error messages *@
+    @if (!ViewData.ModelState.IsValid)
+   {
+var hasErrors = ViewData.ModelState.Values.Any(v => v.Errors.Any(e => !string.IsNullOrWhiteSpace(e.ErrorMessage)));
+    @if (hasErrors)
+      {
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+ @foreach (var modelState in ViewData.ModelState.Values)
+   {
+        @foreach (var error in modelState.Errors)
+    {
+  @if (!string.IsNullOrWhiteSpace(error.ErrorMessage))
+      {
+    <div>@error.ErrorMessage</div>
+    }
+    }
+ }
+     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+ </div>
+ }
+    }
+
+ @* Show a live countdown when server indicates the account is locked *@
+    @if (Model.LockoutEnd.HasValue)
+     {
+<div class="alert alert-warning" role="alert" id="lockoutAlert">
+    <span id="lockoutContent"><strong>Account locked.</strong> Try again in <span id="lockoutCountdown">calculating...</span></span>
+      </div>
+}
+
+        <div class="mb-3">
+     <label class="form-label form-label-sm fw-semibold">Email Address</label>
+  <input asp-for="Email" class="form-control form-control-sm" placeholder="Enter your email" />
+   </div>
+
+   <div class="mb-3">
+ <label class="form-label form-label-sm fw-semibold">Password</label>
+ <div class="input-group input-group-sm">
+  <input asp-for="Password" class="form-control" type="password" id="loginPassword" placeholder="Enter your password" />
+    <button class="btn btn-outline-secondary btn-sm" type="button" id="toggleLoginPassword" aria-label="Show password" title="Show password" style="padding: 0.375rem 0.75rem;">
+<!-- Open Eye (visible when password is hidden) -->
+      <svg id="loginEyeOpen" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+ <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+    <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+   <!-- Closed Eye (hidden by default) -->
+  <svg id="loginEyeClosed" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+       <line x1="1" y1="1" x2="23" y2="23"></line>
+  </svg>
+      </button>
+  </div>
+     </div>
+
+<!-- Hidden input for reCAPTCHA token -->
+<input type="hidden" asp-for="RecaptchaToken" id="recaptchaToken" />
+
+<div class="d-grid gap-2 mb-2">
+    <button type="submit" class="btn btn-primary btn-sm fw-semibold" id="loginButton">Login</button>
+   </div>
+
+ <div class="d-grid gap-2 mb-2">
+  <a href="/ForgotPassword" class="btn btn-outline-warning btn-sm">Forgot Password?</a>
+</div>
+
+ <div class="d-grid gap-2">
+  <a href="/Register" class="btn btn-outline-secondary btn-sm">Create New Account</a>
+</div>
+     </form>
+    </div>
+</div>
+     </div>
+ </div>
+</div>
+
+@if (User?.Identity?.IsAuthenticated == true)
+{
+    <form method="post" asp-page-handler="Logout" class="mt-3">
+  <button type="submit" class="btn btn-danger btn-sm">Logout</button>
+    </form>
+}
+
+@section Scripts {
+<!-- Google reCAPTCHA v3 Script -->
+<script src="https://www.google.com/recaptcha/api.js?render=@recaptchaSiteKey"></script>
+
+<script>
+     (function(){
+   const pw = document.getElementById('loginPassword');
+    const toggle = document.getElementById('toggleLoginPassword');
+    const eyeOpen = document.getElementById('loginEyeOpen');
+const eyeClosed = document.getElementById('loginEyeClosed');
+     if (!toggle || !pw) return;
+        
+ // initialize state: password hidden -> show open eye icon
+     eyeOpen.style.display = '';
+   eyeClosed.style.display = 'none';
+toggle.setAttribute('title','Show password');
+   toggle.setAttribute('aria-label','Show password');
+  
+ toggle.addEventListener('click', function(){
+  const isHidden = pw.type === 'password';
+if (isHidden) {
+  pw.type = 'text';
+eyeOpen.style.display = 'none';
+  eyeClosed.style.display = '';
+   toggle.setAttribute('title','Hide password');
+      toggle.setAttribute('aria-label','Hide password');
+ } else {
+        pw.type = 'password';
+ eyeOpen.style.display = '';
+    eyeClosed.style.display = 'none';
+    toggle.setAttribute('title','Show password');
+toggle.setAttribute('aria-label','Show password');
+    }
+   });
+
+ // Live lockout countdown
+     const lockoutCountdownEl = document.getElementById('lockoutCountdown');
+     const lockoutContentEl = document.getElementById('lockoutContent');
+   const lockoutEndString = '@(Model.LockoutEnd.HasValue ? Model.LockoutEnd.Value.UtcDateTime.ToString("o") : String.Empty)';
+   if (lockoutCountdownEl && lockoutEndString) {
+  const end = new Date(lockoutEndString); // parsed as UTC
+    function updateCountdown() {
+  const now = new Date();
+  let diff = end.getTime() - now.getTime();
+   if (diff <= 0) {
+  lockoutContentEl.textContent = 'You may try again now.';
+clearInterval(intervalId);
+ return;
+      }
+  const totalSeconds = Math.floor(diff / 1000);
+     const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+   lockoutCountdownEl.textContent = `${minutes}m ${seconds}s`;
+  }
+ // update immediately and then every second for smooth countdown
+ updateCountdown();
+ const intervalId = setInterval(updateCountdown, 1000);
+    }
+
+    // reCAPTCHA v3 token generation on form submit
+    const loginForm = document.getElementById('loginForm');
+    const loginButton = document.getElementById('loginButton');
+    const recaptchaSiteKey = '@recaptchaSiteKey';
+ 
+    loginForm.addEventListener('submit', function(e){
+     // Prevent default form submission
+        e.preventDefault();
+      
+    // Show loading state
+        loginButton.disabled = true;
+      loginButton.textContent = 'Verifying...';
+    
+        // Execute reCAPTCHA
+        grecaptcha.ready(function(){
+     grecaptcha.execute(recaptchaSiteKey, { action: 'login' }).then(function(token){
+   // Set the token in the hidden input
+     document.getElementById('recaptchaToken').value = token;
+    
+  // Submit the form
+        loginForm.submit();
+  }).catch(function(error){
+     console.error('reCAPTCHA execution failed:', error);
+    loginButton.disabled = false;
+ loginButton.textContent = 'Login';
+    });
+        });
+    });
+
+     })();
+ </script>
+}

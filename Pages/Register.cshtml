@@ -1,0 +1,213 @@
+﻿@page
+@model WebApplication1.Pages.RegisterModel
+@{
+}
+
+<div class="container mt-4">
+	<div class="row justify-content-center">
+		<div class="col-md-5 col-lg-5">
+			<div class="text-center mb-4">
+				<h1 class="h3 fw-bold">Create Account</h1>
+				<p class="text-muted small">Join Ace Job Agency</p>
+			</div>
+
+			<div class="card shadow-lg">
+				<div class="card-body p-4">
+					<form method="post" enctype="multipart/form-data" id="registerForm">
+						<!-- CSRF Token - prevents CSRF attacks -->
+						@Html.AntiForgeryToken()
+
+						<div asp-validation-summary="All" class="text-danger"></div>
+
+						<div class="row">
+							<div class="mb-3 col-6">
+								<label class="form-label form-label-sm fw-semibold" asp-for="RModel.FirstName">First Name</label>
+								<input asp-for="RModel.FirstName" class="form-control form-control-sm" />
+								<span asp-validation-for="RModel.FirstName" class="text-danger small"></span>
+							</div>
+
+							<div class="mb-3 col-6">
+								<label class="form-label form-label-sm fw-semibold" asp-for="RModel.LastName">Last Name</label>
+								<input asp-for="RModel.LastName" class="form-control form-control-sm" />
+								<span asp-validation-for="RModel.LastName" class="text-danger small"></span>
+							</div>
+						</div>
+
+						<div class="mb-3">
+							<label class="form-label form-label-sm fw-semibold" asp-for="RModel.Gender">Gender</label>
+							<select asp-for="RModel.Gender" class="form-select form-select-sm">
+								<option value="">Select gender</option>
+								<option>Male</option>
+								<option>Female</option>
+								<option>Other</option>
+							</select>
+							<span asp-validation-for="RModel.Gender" class="text-danger small"></span>
+						</div>
+
+						<div class="mb-3">
+							<label class="form-label form-label-sm fw-semibold" asp-for="RModel.Nric">NRIC</label>
+							<input asp-for="RModel.Nric" class="form-control form-control-sm" />
+							<span asp-validation-for="RModel.Nric" class="text-danger small"></span>
+						</div>
+
+						<div class="mb-3">
+							<label class="form-label form-label-sm fw-semibold" asp-for="RModel.Email">Email Address</label>
+							<input asp-for="RModel.Email" class="form-control form-control-sm" />
+							<span asp-validation-for="RModel.Email" class="text-danger small"></span>
+						</div>
+
+						<div class="mb-3">
+							<label class="form-label form-label-sm fw-semibold" asp-for="RModel.Password">Password</label>
+							<div class="input-group input-group-sm">
+								<input asp-for="RModel.Password" class="form-control" type="password" id="password" autocomplete="new-password" />
+								<button class="btn btn-outline-secondary btn-sm" type="button" id="togglePassword" aria-label="Toggle password visibility" style="padding: 0.375rem 0.75rem;">
+									<!-- Open Eye (visible when password is hidden) -->
+									<svg id="passwordEyeOpen" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+										<circle cx="12" cy="12" r="3"></circle>
+									</svg>
+									<!-- Closed Eye (hidden by default) -->
+									<svg id="passwordEyeClosed" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+										<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+										<line x1="1" y1="1" x2="23" y2="23"></line>
+									</svg>
+								</button>
+							</div>
+							<span asp-validation-for="RModel.Password" class="text-danger small"></span>
+
+							<div class="mt-2" id="passwordRules">
+								<small>
+									<ul class="list-unstyled">
+										<li id="rule-length" class="text-muted">• At least 12 characters</li>
+										<li id="rule-lower" class="text-muted">• At least one lower-case letter</li>
+										<li id="rule-upper" class="text-muted">• At least one upper-case letter</li>
+										<li id="rule-digit" class="text-muted">• At least one number</li>
+										<li id="rule-special" class="text-muted">• At least one special character</li>
+									</ul>
+								</small>
+								<div class="mt-1">
+									<span id="passwordStrength" class="badge bg-secondary small">Password strength: N/A</span>
+								</div>
+							</div>
+						</div>
+
+						<div class="mb-3">
+							<label class="form-label form-label-sm fw-semibold" asp-for="RModel.ConfirmPassword">Confirm Password</label>
+							<div class="input-group input-group-sm">
+								<input asp-for="RModel.ConfirmPassword" class="form-control" type="password" id="confirmPassword" autocomplete="new-password" />
+								<button class="btn btn-outline-secondary btn-sm" type="button" id="toggleConfirmPassword" aria-label="Toggle confirm password visibility" style="padding: 0.375rem 0.75rem;">
+									<!-- Open Eye (visible when password is hidden) -->
+									<svg id="confirmEyeOpen" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+										<circle cx="12" cy="12" r="3"></circle>
+									</svg>
+									<!-- Closed Eye (hidden by default) -->
+									<svg id="confirmEyeClosed" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+										<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+										<line x1="1" y1="1" x2="23" y2="23"></line>
+									</svg>
+								</button>
+							</div>
+							<span asp-validation-for="RModel.ConfirmPassword" class="text-danger small"></span>
+						</div>
+
+						<div class="mb-3">
+							<label class="form-label form-label-sm fw-semibold" asp-for="RModel.DateOfBirth">Date of Birth</label>
+							<input asp-for="RModel.DateOfBirth" class="form-control form-control-sm" type="date" />
+							<span asp-validation-for="RModel.DateOfBirth" class="text-danger small"></span>
+						</div>
+
+						<div class="mb-3">
+							<label class="form-label form-label-sm fw-semibold" asp-for="RModel.Resume">Resume (.pdf or .docx)</label>
+							<input asp-for="RModel.Resume" type="file" class="form-control form-control-sm" accept=".pdf,.docx" />
+							<span asp-validation-for="RModel.Resume" class="text-danger small"></span>
+						</div>
+
+						<div class="mb-3">
+							<label class="form-label form-label-sm fw-semibold" asp-for="RModel.WhoAmI">Who Am I</label>
+							<textarea asp-for="RModel.WhoAmI" class="form-control form-control-sm" rows="3"></textarea>
+							<span asp-validation-for="RModel.WhoAmI" class="text-danger small"></span>
+						</div>
+
+						<div class="d-grid gap-2 mb-2">
+							<button type="submit" class="btn btn-primary btn-sm fw-semibold" id="submitBtn">Register</button>
+						</div>
+
+						<div class="d-grid gap-2">
+							<a href="/Login" class="btn btn-outline-secondary btn-sm">Back to Login</a>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<script>
+		(function(){
+			const password = document.getElementById('password');
+			const confirmPassword = document.getElementById('confirmPassword');
+			const submitBtn = document.getElementById('submitBtn');
+			const strengthBadge = document.getElementById('passwordStrength');
+			const rules = {
+				length: document.getElementById('rule-length'),
+				lower: document.getElementById('rule-lower'),
+				upper: document.getElementById('rule-upper'),
+				digit: document.getElementById('rule-digit'),
+				special: document.getElementById('rule-special')
+			};
+
+			function testPassword(pw){
+				return {
+					length: pw.length >=12,
+					lower: /[a-z]/.test(pw),
+					upper: /[A-Z]/.test(pw),
+					digit: /\d/.test(pw),
+					special: /[^A-Za-z0-9]/.test(pw)
+				};
+			}
+
+			function updateUI(){
+				const pw = password.value || '';
+				const results = testPassword(pw);
+				let met =0;
+				for (const k in results){
+					if (results[k]){ met++; rules[k].classList.remove('text-muted'); rules[k].classList.add('text-success'); }
+					else { rules[k].classList.remove('text-success'); rules[k].classList.add('text-muted'); }
+				}
+
+				if (met ===5){ strengthBadge.textContent = 'Password strength: STRONG'; strengthBadge.className = 'badge bg-success small'; submitBtn.disabled = false; }
+				else if (met >=3){ strengthBadge.textContent = 'Password strength: MEDIUM'; strengthBadge.className = 'badge bg-warning text-dark small'; submitBtn.disabled = true; }
+				else { strengthBadge.textContent = 'Password strength: WEAK'; strengthBadge.className = 'badge bg-danger small'; submitBtn.disabled = true; }
+			}
+
+			// Toggle handlers for show/hide password buttons
+			const togglePassword = document.getElementById('togglePassword');
+			const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+
+			function toggleInputVisibility(inputEl, toggleBtn, eyeOpenId, eyeClosedId){
+				if (!inputEl || !toggleBtn) return;
+				const eyeOpen = document.getElementById(eyeOpenId);
+				const eyeClosed = document.getElementById(eyeClosedId);
+				if (inputEl.type === 'password'){
+					inputEl.type = 'text';
+					if (eyeOpen) eyeOpen.style.display = 'none';
+					if (eyeClosed) eyeClosed.style.display = '';
+				} else {
+					inputEl.type = 'password';
+					if (eyeOpen) eyeOpen.style.display = '';
+					if (eyeClosed) eyeClosed.style.display = 'none';
+				}
+			}
+
+			if (togglePassword){ togglePassword.addEventListener('click', function(){ toggleInputVisibility(password, togglePassword, 'passwordEyeOpen', 'passwordEyeClosed'); }); }
+			if (toggleConfirmPassword){ toggleConfirmPassword.addEventListener('click', function(){ toggleInputVisibility(confirmPassword, toggleConfirmPassword, 'confirmEyeOpen', 'confirmEyeClosed'); }); }
+
+			password.addEventListener('input', updateUI);
+			confirmPassword.addEventListener('input', updateUI);
+			// Initialize
+			updateUI();
+		})();
+	</script>
+}
