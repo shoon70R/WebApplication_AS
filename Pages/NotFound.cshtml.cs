@@ -18,7 +18,8 @@ namespace WebApplication1.Pages
      public void OnGet()
         {
             RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
-      _logger.LogWarning($"Page Not Found (404) - Path: {Request.Path} - RequestId: {RequestId}");
+            var sanitizedPath = Request.Path.ToString().Replace("\r", string.Empty).Replace("\n", string.Empty);
+            _logger.LogWarning($"Page Not Found (404) - Path: {sanitizedPath} - RequestId: {RequestId}");
         }
   }
 }
